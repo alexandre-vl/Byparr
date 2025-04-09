@@ -16,15 +16,20 @@ ENV PATH="${HOME}/.local/bin:$PATH"
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends --no-install-suggests xauth xvfb scrot curl chromium chromium-driver ca-certificates
+    apt-get install -y --no-install-recommends --no-install-suggests xauth xvfb scrot curl ca-certificates wget && \
+    wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_134.0.6998.88-1_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_134.0.6998.88-1_amd64.deb && \
+    rm google-chrome-stable_134.0.6998.88-1_amd64.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ADD https://astral.sh/uv/install.sh install.sh
 RUN sh install.sh
 COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=${HOME}/.cache/uv uv sync
 
-# SeleniumBase does not come with an arm64 chromedriver binary
-RUN cd .venv/lib/*/site-packages/seleniumbase/drivers && ln -s /usr/bin/chromedriver uc_driver
+# Update symlink to point to Google Chrome
+RUN cd .venv/lib/*/site-packages/seleniumbase/drivers && ln -sf /usr/bin/google-chrome uc_driver
 
 COPY . .
 
