@@ -66,3 +66,9 @@ class LinkResponse(BaseModel):
             solution=Solution.invalid(url),
             start_timestamp=int(time.time() * 1000),
         )
+
+
+class ImageDownloadRequest(BaseModel):
+    url: str = Field(pattern=r"^https?://", description="URL of the page containing the image")
+    image_selector: str = Field(description="CSS selector to identify the image element")
+    max_timeout: int = Field(default=60)
