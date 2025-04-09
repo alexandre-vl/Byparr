@@ -9,7 +9,13 @@ from src.consts import LOG_LEVEL, PROXY, USE_HEADLESS
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(LOG_LEVEL)
 if len(logger.handlers) == 0:
-    logger.addHandler(logging.StreamHandler())
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)s - %(name)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+# Do not propagate to avoid duplicate logs
+logger.propagate = False
 
 
 def get_sb(
